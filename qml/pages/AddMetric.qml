@@ -10,6 +10,7 @@ Page {
 
 
     function addMetric(value){
+        value = value.replace(',', '.');
         //load user_code from homepage, if(depth==3)adding from history else from homepage
         if(depth==3) user_code=previousPage().rootPage.user_code;
         else user_code=previousPage().user_code;
@@ -59,7 +60,7 @@ Page {
                 placeholderText: "Weight"
                 EnterKey.iconSource: "image://theme/icon-m-enter-next"
                 EnterKey.onClicked: phoneField.focus = true
-                validator: RegExpValidator { regExp: /^[1-9][0-9][0-9]?$/ }
+                validator: RegExpValidator { regExp: /^\d+([\.|,]\d{1,2})?$/ }
             }
             Button {
                 text: 'Add'

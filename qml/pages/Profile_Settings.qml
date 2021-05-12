@@ -119,6 +119,7 @@ Page {
         birthdayValue.text = birthday
     }
     function updateHeight (height){
+        height = height.replace(',', '.');
         var db = LocalStorage.openDatabaseSync("ExampleDB", "1.0", "Database application", 100000);
         db.transaction(
             function(tx){
@@ -383,7 +384,7 @@ Page {
                                     inputMethodHints: Qt.ImhFormattedNumbersOnly
                                     EnterKey.iconSource: "image://theme/icon-m-enter-next"
                                     EnterKey.onClicked: phoneField.focus = true
-                                    validator: RegExpValidator { regExp: /^[1-9][0-9][0-9]$/ }
+                                    validator: RegExpValidator { regExp: /^\d+([\.|,]\d{1,2})?$/ }
                                 }
 
                             }

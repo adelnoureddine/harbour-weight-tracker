@@ -74,7 +74,7 @@ Page {
                     user_code = rs.rows.item(0).USER_CODE;
                     user_lastname = rs.rows.item(0).LASTNAME;
                     user_name = rs.rows.item(0).FIRSTNAME;
-                    user_height = rs.rows.item(0).HEIGHT;
+                    user_height = parseFloat(rs.rows.item(0).HEIGHT);
                 }
                 rs = tx.executeSql('SELECT MAX(METRIC_CODE) AS METRIC FROM METRICS WHERE USER_CODE=?',[user_code]);
                 if(rs.rows.item(0).METRIC===null) user_weight = 0
@@ -83,13 +83,13 @@ Page {
                 }
                 rs = tx.executeSql('SELECT * FROM METRICS WHERE USER_CODE=? AND CATEGORIE=? AND METRIC_CODE=?',[user_code,"WEIGHT",metric_code]);
                 if(rs.rows.length > 0){
-                    user_weight = rs.rows.item(0).VAL;
+                    user_weight = parseFloat(rs.rows.item(0).VAL);
                 }
             }
         )
         user_description = "Welcome " + user_name + " " + user_lastname + "!"
-        u_height = " Height : " + user_height.toFixed(2) + " cm."
-        u_weight = " Weight : " + user_weight.toFixed(2) + " kg."
+        u_height = " Height : " + user_height + " cm."
+        u_weight = " Weight : " + user_weight + " kg."
     }
 
     function calculate() {
@@ -382,7 +382,7 @@ Page {
                                              inputMethodHints: Qt.ImhFormattedNumbersOnly
                                              EnterKey.iconSource: "image://theme/icon-m-enter-next"
                                              EnterKey.onClicked: phoneField.focus = true
-                                             validator: RegExpValidator { regExp: /^[1-9][0-9][0-9]$/ }
+                                             validator: RegExpValidator { regExp: /^\d+([\.|,]\d{1,2})?$/ }
                                          }
 
                                          }

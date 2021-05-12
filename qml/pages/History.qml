@@ -76,10 +76,11 @@ Page {
                 })
             }
             function edit(value) {
+                value = value.replace(',', '.');
                 var db = LocalStorage.openDatabaseSync("ExampleDB", "1.0", "Database application", 100000);
                 db.transaction(
                     function(tx){
-                        tx.executeSql('UPDATE METRICS SET VAL=? WHERE METRIC_CODE=?',[parseInt(value),metric_tab[index]])
+                        tx.executeSql('UPDATE METRICS SET VAL=? WHERE METRIC_CODE=?',[parseFloat(value),metric_tab[index]])
                     }
                 )
                 rootPage.load()
@@ -140,7 +141,7 @@ Page {
                                 placeholderText: "Weight"
                                 EnterKey.iconSource: "image://theme/icon-m-enter-next"
                                 EnterKey.onClicked: phoneField.focus = true
-                                validator: RegExpValidator { regExp: /^[1-9][0-9][0-9]?$/ }
+                                validator: RegExpValidator { regExp: /^\d+([\.|,]\d{1,2})?$/ }
                             }
                         }
                     }

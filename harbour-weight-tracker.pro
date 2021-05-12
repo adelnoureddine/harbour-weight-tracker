@@ -23,7 +23,7 @@ DISTFILES += qml/harbour-weight-tracker.qml \
     qml/pages/FirstPage.qml \
     qml/pages/History.qml \
     qml/pages/Profile_Settings.qml \
-    rpm/harbour-weight-tracker.changes.in \
+    rpm/harbour-weight-tracker.changes \
     rpm/harbour-weight-tracker.changes.run.in \
     rpm/harbour-weight-tracker.spec \
     rpm/harbour-weight-tracker.yaml \

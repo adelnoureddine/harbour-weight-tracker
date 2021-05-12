@@ -33,8 +33,21 @@ Page {
             }
 
             SectionHeader {
+                text: qsTr("Maintainer")
+            }
+
+            Label {
+                text: qsTr("Adel Noureddine")
+                font.pixelSize: Theme.fontSizeSmall
+                anchors {
+                    horizontalCenter: parent.horizontalCenter
+                }
+            }
+
+            SectionHeader {
                 text: qsTr("Authors")
             }
+
             Label {
                 text: qsTr("Manon Sauvageot")
                 font.pixelSize: Theme.fontSizeSmall
@@ -58,6 +71,30 @@ Page {
             }
 
             SectionHeader {
+                text: qsTr("Contributors")
+            }
+
+            Label {
+                text: qsTr("Adel Noureddine")
+                font.pixelSize: Theme.fontSizeSmall
+                anchors {
+                    horizontalCenter: parent.horizontalCenter
+                }
+            }
+
+            SectionHeader {
+                text: qsTr("Translators")
+            }
+
+            Label {
+                text: qsTr("XXX XXX")
+                font.pixelSize: Theme.fontSizeSmall
+                anchors {
+                    horizontalCenter: parent.horizontalCenter
+                }
+            }
+
+            SectionHeader {
                 text: qsTr("Source Code")
             }
 
@@ -70,14 +107,14 @@ Page {
             }
 
             Text {
-                text: "<a href=\"https://gitlab.com/adelnoureddine/suivi-de-poids-sailfishos-m1-ti\">" + qsTr("View source code on GitLab") + "</a>"
+                text: "<a href=\"https://gitlab.com/adelnoureddine/harbour-weight-tracker\">" + qsTr("View source code on GitLab") + "</a>"
                 anchors {
                     horizontalCenter: parent.horizontalCenter
                 }
                 font.pixelSize: Theme.fontSizeSmall
                 linkColor: Theme.highlightColor
 
-                onLinkActivated: Qt.openUrlExternally("https://github.com/adelnoureddine/harbour-simple-bmi-calculator")
+                onLinkActivated: Qt.openUrlExternally("https://gitlab.com/adelnoureddine/harbour-weight-tracker")
             }
 
             SectionHeader {
