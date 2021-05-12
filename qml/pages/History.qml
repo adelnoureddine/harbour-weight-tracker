@@ -3,15 +3,12 @@ import Sailfish.Silica 1.0
 import QtQuick.LocalStorage 2.0
 
 Page {
+    id: page
     allowedOrientations: Orientation.All
 
-    id: page
     property bool deletingItems
     property Page rootPage
     property variant metric_tab: []
-
-    // The effective value will be restricted by ApplicationWindow.allowedOrientations
-    allowedOrientations: Orientation.All
 
     function load(){
     listModel.load()
@@ -176,7 +173,7 @@ Page {
                     var entries = rs.rows.length;
                     for(var i =0; i< rs.rows.length;i++){
                         metric_tab[i] = rs.rows.item(i).METRIC_CODE;
-                        listModel.append({"text": rs.rows.item(i).METRIC_DATE + "                               " + rs.rows.item(i).VAL});
+                        listModel.append({"text": rs.rows.item(i).METRIC_DATE + "                               " + rs.rows.item(i).VAL + " kg"});
                     }
                 }
             )

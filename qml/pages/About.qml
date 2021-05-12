@@ -3,12 +3,11 @@ import Sailfish.Silica 1.0
 
 Page {
     id: page
-
-    // The effective value will be restricted by ApplicationWindow.allowedOrientations
     allowedOrientations: Orientation.All
 
     SilicaFlickable {
         anchors.fill: parent
+        VerticalScrollDecorator {}
 
         Column {
             id: column
@@ -33,37 +32,13 @@ Page {
             }
 
             SectionHeader {
-                text: qsTr("Maintainer")
-            }
-
-            Label {
-                text: qsTr("Adel Noureddine")
-                font.pixelSize: Theme.fontSizeSmall
-                anchors {
-                    horizontalCenter: parent.horizontalCenter
-                }
-            }
-
-            SectionHeader {
                 text: qsTr("Authors")
             }
 
             Label {
-                text: qsTr("Manon Sauvageot")
-                font.pixelSize: Theme.fontSizeSmall
-                anchors {
-                    horizontalCenter: parent.horizontalCenter
-                }
-            }
-            Label {
-                text: qsTr("Yoann Dumont")
-                font.pixelSize: Theme.fontSizeSmall
-                anchors {
-                    horizontalCenter: parent.horizontalCenter
-                }
-            }
-            Label {
-                text: qsTr("Louis Puyou")
+                wrapMode: Text.Wrap
+                x: Theme.horizontalPageMargin
+                text: qsTr("Manon Sauvageot, Yoann Dumont, and Louis Puyou")
                 font.pixelSize: Theme.fontSizeSmall
                 anchors {
                     horizontalCenter: parent.horizontalCenter
@@ -75,19 +50,9 @@ Page {
             }
 
             Label {
-                text: qsTr("Adel Noureddine")
-                font.pixelSize: Theme.fontSizeSmall
-                anchors {
-                    horizontalCenter: parent.horizontalCenter
-                }
-            }
-
-            SectionHeader {
-                text: qsTr("Translators")
-            }
-
-            Label {
-                text: qsTr("XXX XXX")
+                wrapMode: Text.Wrap
+                x: Theme.horizontalPageMargin
+                text: qsTr("Adel Noureddine (and maintainer)")
                 font.pixelSize: Theme.fontSizeSmall
                 anchors {
                     horizontalCenter: parent.horizontalCenter

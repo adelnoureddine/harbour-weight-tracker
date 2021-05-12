@@ -4,9 +4,9 @@ import QtQuick.LocalStorage 2.0
 
 
 Page {
+    id: root
     allowedOrientations: Orientation.All
 
-    id: root
     property variant usercodes: []
     property int currentProfileIndex
     property string user_description;
@@ -90,8 +90,8 @@ Page {
             }
         )
         user_description = "Welcome " + user_name + " " + user_lastname + "!"
-        u_height = " Height : " + user_height + " cm."
-        u_weight = " Weight : " + user_weight + " kg."
+        u_height = " Height: " + user_height + " cm"
+        u_weight = " Weight: " + user_weight + " kg"
     }
 
     function calculate() {
@@ -394,7 +394,7 @@ Page {
                                      Column {
                                          width: parent.width
                                          PageHeader {
-                                             title: "Choose Profile"
+                                             title: "Change Profile"
                                          }
                                          ListModel{
                                              id:listModel

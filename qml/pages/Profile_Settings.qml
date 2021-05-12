@@ -3,9 +3,9 @@ import Sailfish.Silica 1.0
 import QtQuick.LocalStorage 2.0
 
 Page {
+    id: page
     allowedOrientations: Orientation.All
 
-    id: page
     property int user_code
     property string user_lastname;
     property string user_firstname;
@@ -131,11 +131,9 @@ Page {
         heightValue.text = height + " cm"
     }
 
-
-    allowedOrientations: Orientation.All
-
     SilicaFlickable {
         anchors.fill: parent
+
         PullDownMenu {
             MenuItem {
                 text: "Remove Profile"
@@ -167,14 +165,12 @@ Page {
                     text: qsTr("First name :")
                     width:page.width / 2.5
                     color: Theme.secondaryHighlightColor
-                    font.pixelSize: Theme.fontSizeExtraLarge
                 }
                 Label {
                     id:firstnameValue
                     text:user_firstname
                     width:page.width / 1.5
                     color: Theme.secondaryColor
-                    font.pixelSize: Theme.fontSizeExtraLarge
                 }
             }
 
@@ -185,7 +181,6 @@ Page {
                     text: qsTr("Last name :")
                     width:page.width / 2.5
                     color: Theme.secondaryHighlightColor
-                    font.pixelSize: Theme.fontSizeExtraLarge
 
                 }
                 Label {
@@ -193,7 +188,6 @@ Page {
                     text:user_lastname
                     width:page.width / 1.5
                     color: Theme.secondaryColor
-                    font.pixelSize: Theme.fontSizeExtraLarge
                 }
 
             }
@@ -205,14 +199,12 @@ Page {
                     text: qsTr("Gender :")
                     width:page.width / 2.5
                     color: Theme.secondaryHighlightColor
-                    font.pixelSize: Theme.fontSizeExtraLarge
                 }
                 Label {
                     id:genderValue
                     text:user_gender
                     width:page.width / 1.5
                     color: Theme.secondaryColor
-                    font.pixelSize: Theme.fontSizeExtraLarge
                 }
             }
 
@@ -223,14 +215,12 @@ Page {
                     text: qsTr("Birthday :")
                     width:page.width / 2.5
                     color: Theme.secondaryHighlightColor
-                    font.pixelSize: Theme.fontSizeExtraLarge
                 }
                 Label {
                     id:birthdayValue
                     text:user_birthday
                     width:page.width / 1.5
                     color: Theme.secondaryColor
-                    font.pixelSize: Theme.fontSizeExtraLarge
                 }
             }
 
@@ -241,14 +231,12 @@ Page {
                     text: qsTr("Height :")
                     width:page.width / 2.5
                     color: Theme.secondaryHighlightColor
-                    font.pixelSize: Theme.fontSizeExtraLarge
                 }
                 Label {
                     id:heightValue
                     text:user_height + " cm"
                     width:page.width / 1.5
                     color: Theme.secondaryColor
-                    font.pixelSize: Theme.fontSizeExtraLarge
                 }
             }
 
@@ -268,133 +256,80 @@ Page {
 
                         Column {
                             id: dialogColumn
-                            width:page.width
+                            x: Theme.paddingLarge
+                            width: page.width
                             spacing: Theme.paddingLarge
 
                             DialogHeader {
                                 title: "Modify your profile"
                             }
 
-
-                            Row{//FIRSTNAME
-                                id: firstnameRow
-
-                                Label {
-                                    text: qsTr("First name :")
-                                    width:page.width / 2.5
-                                    color: Theme.secondaryHighlightColor
-                                    font.pixelSize: Theme.fontSizeExtraLarge
-                                }
-                                TextField{
-                                    id : firstnameField
-                                    width:page.width / 1.5
-                                    text: user_firstname
-                                }
+                            TextField {
+                                id : firstnameField
+                                width: page.width
+                                text: user_firstname
+                                label: "First name"
                             }
 
-                            Row{ //LASTNAME
-                                id: lastnameRow
-
-                                Label {
-                                    text: qsTr("Last name :")
-                                    width:page.width / 2.5
-                                    color: Theme.secondaryHighlightColor
-                                    font.pixelSize: Theme.fontSizeExtraLarge
-
-                                }
-                                TextField{
-                                    id : lastnameField
-                                    width:page.width / 1.5
-                                    text: user_lastname
-                                }
-
+                            TextField{
+                                id : lastnameField
+                                width: page.width
+                                text: user_lastname
+                                label: "Last name"
                             }
 
-                            Row{//GENDER
-                                id: genderRow
-
-                                Label {
-                                    text: qsTr("Gender :")
-                                    width:page.width / 2.5
-                                    color: Theme.secondaryHighlightColor
-                                    font.pixelSize: Theme.fontSizeExtraLarge
+                            ComboBox {
+                                function getCurrentIndex(){
+                                    if (user_gender === "M") return 1
+                                    if (user_gender === "F") return 0
                                 }
-                                ComboBox {
-                                    function getCurrentIndex(){
-                                        if (user_gender === "M") return 1
-                                        if (user_gender === "F") return 0
-                                    }
 
-                                    id:genderField
-                                    currentIndex: getCurrentIndex()
-                                    menu: ContextMenu {
-                                        MenuItem { text: "F" }
-                                        MenuItem { text: "M" }
-                                    }
-                                    width: parent.width/2
+                                id:genderField
+                                currentIndex: getCurrentIndex()
+                                menu: ContextMenu {
+                                    MenuItem { text: "F" }
+                                    MenuItem { text: "M" }
                                 }
+                                width: page.width
+                                label: "Gender"
                             }
 
-                            Row{//BIRTHDAY
-                                id: birthdayRow
+                            ValueButton {
+                                property date selectedDate
 
-                                Label {
-                                    text: qsTr("Birthday :")
-                                    width:page.width / 2.5
-                                    color: Theme.secondaryHighlightColor
-                                    font.pixelSize: Theme.fontSizeExtraLarge
-                                }
+                                function openDateDialog() {
+                                    var obj = pageStack.animatorPush("Sailfish.Silica.DatePickerDialog",
+                                                                     { date: selectedDate })
 
-                                ValueButton {
-                                    property date selectedDate
-
-                                    function openDateDialog() {
-                                        var obj = pageStack.animatorPush("Sailfish.Silica.DatePickerDialog",
-                                                                         { date: selectedDate })
-
-                                        obj.pageCompleted.connect(function(page) {
-                                            page.accepted.connect(function() {
-                                                //value = page.dateText
-                                                selectedDate = page.date
-                                                value = selectedDate.toLocaleDateString("yyyy-MM-dd")
-                                            })
+                                    obj.pageCompleted.connect(function(page) {
+                                        page.accepted.connect(function() {
+                                            //value = page.dateText
+                                            selectedDate = page.date
+                                            value = selectedDate.toLocaleDateString("yyyy-MM-dd")
                                         })
-                                    }
-
-                                    //label: "Date"
-                                    id : birthdayField
-                                    value: Qt.formatDate(new Date(user_birthday))
-                                    width: parent.width
-                                    onClicked: openDateDialog()
+                                    })
                                 }
+
+                                id : birthdayField
+                                value: Qt.formatDate(new Date(user_birthday))
+                                width: page.width
+                                onClicked: openDateDialog()
+                                label: "Birthday"
                             }
 
-                            Row{//HEIGHT
-                                id: heightRow
-
-                                Label {
-                                    text: qsTr("Height :")
-                                    width:page.width / 2.5
-                                    color: Theme.secondaryHighlightColor
-                                    font.pixelSize: Theme.fontSizeExtraLarge
-                                }
-                                TextField{
-                                    id : heightField
-                                    width:page.width / 1.5
-                                    text: user_height
-                                    label: "cm"
-                                    inputMethodHints: Qt.ImhFormattedNumbersOnly
-                                    EnterKey.iconSource: "image://theme/icon-m-enter-next"
-                                    EnterKey.onClicked: phoneField.focus = true
-                                    validator: RegExpValidator { regExp: /^\d+([\.|,]\d{1,2})?$/ }
-                                }
-
+                            TextField{
+                                id : heightField
+                                width:page.width / 1.5
+                                text: user_height
+                                label: "Height (in cm)"
+                                inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                EnterKey.iconSource: "image://theme/icon-m-enter-next"
+                                EnterKey.onClicked: phoneField.focus = true
+                                validator: RegExpValidator { regExp: /^\d+([\.|,]\d{1,2})?$/ }
                             }
-
-
                         }
-
                     }
+
                     onAccepted: {
                         updateLastname(lastnameField.text)
                         updateFirstname(firstnameField.text)
@@ -420,7 +355,7 @@ Page {
                         Column {
                             id: mainColumn
                             x: Theme.paddingLarge
-                            width:page.width
+                            width: page.width
                             spacing: Theme.paddingLarge
                             DialogHeader {
                                 title: "Delete this profile ?"
@@ -434,14 +369,12 @@ Page {
                                     text: qsTr("First name :")
                                     width:page.width / 2.5
                                     color: Theme.secondaryHighlightColor
-                                    font.pixelSize: Theme.fontSizeExtraLarge
                                 }
                                 Label {
                                     id:firstnameValue
                                     text:user_firstname
                                     width:page.width / 1.5
                                     color: Theme.secondaryColor
-                                    font.pixelSize: Theme.fontSizeExtraLarge
                                 }
                             }
 
@@ -450,7 +383,6 @@ Page {
                                     text: qsTr("Last name :")
                                     width:page.width / 2.5
                                     color: Theme.secondaryHighlightColor
-                                    font.pixelSize: Theme.fontSizeExtraLarge
 
                                 }
                                 Label {
@@ -458,7 +390,6 @@ Page {
                                     text:user_lastname
                                     width:page.width / 1.5
                                     color: Theme.secondaryColor
-                                    font.pixelSize: Theme.fontSizeExtraLarge
                                 }
 
                             }
@@ -470,14 +401,12 @@ Page {
                                     text: qsTr("Gender :")
                                     width:page.width / 2.5
                                     color: Theme.secondaryHighlightColor
-                                    font.pixelSize: Theme.fontSizeExtraLarge
                                 }
                                 Label {
                                     id:genderValue
                                     text:user_gender
                                     width:page.width / 1.5
                                     color: Theme.secondaryColor
-                                    font.pixelSize: Theme.fontSizeExtraLarge
                                 }
                             }
 
@@ -488,14 +417,12 @@ Page {
                                     text: qsTr("Birthday :")
                                     width:page.width / 2.5
                                     color: Theme.secondaryHighlightColor
-                                    font.pixelSize: Theme.fontSizeExtraLarge
                                 }
                                 Label {
                                     id:birthdayValue
                                     text:user_birthday
                                     width:page.width / 1.5
                                     color: Theme.secondaryColor
-                                    font.pixelSize: Theme.fontSizeExtraLarge
                                 }
                             }
 
@@ -506,14 +433,12 @@ Page {
                                     text: qsTr("Height :")
                                     width:page.width / 2.5
                                     color: Theme.secondaryHighlightColor
-                                    font.pixelSize: Theme.fontSizeExtraLarge
                                 }
                                 Label {
                                     id:heightValue
                                     text:user_height + " cm"
                                     width:page.width / 1.5
                                     color: Theme.secondaryColor
-                                    font.pixelSize: Theme.fontSizeExtraLarge
                                 }
                             }
                         }

@@ -3,6 +3,8 @@ import Sailfish.Silica 1.0
 import QtQuick.LocalStorage 2.0
 
 Page {
+    id: newMetric
+    backNavigation: true
 
     allowedOrientations: Orientation.All
 
@@ -39,9 +41,6 @@ Page {
 
     }
 
-        id: newMetric
-    backNavigation: true
-
     SilicaFlickable {
         anchors.fill: parent
         contentHeight: column.height
@@ -51,7 +50,7 @@ Page {
             width: parent.width
             spacing: Theme.paddingLarge
 
-            PageHeader { title: 'Add new metric:' }
+            PageHeader { title: 'Add new metric' }
 
             TextField {
                 id: metricField
