@@ -4,6 +4,8 @@ import QtQuick.LocalStorage 2.0
 
 
 Page {
+    allowedOrientations: Orientation.All
+
     id: root
     property variant usercodes: []
     property int currentProfileIndex
@@ -135,11 +137,6 @@ Page {
             category_bmi_description = ""
         }
     }
-
-
-
-
-
 
     SilicaFlickable {
         anchors.fill: parent

@@ -3,6 +3,8 @@ import Sailfish.Silica 1.0
 import QtQuick.LocalStorage 2.0
 
 Page {
+    allowedOrientations: Orientation.All
+
     id: page
     property int user_code
     property string user_lastname;

@@ -3,6 +3,8 @@ import Sailfish.Silica 1.0
 import QtQuick.LocalStorage 2.0
 
 Page {
+    allowedOrientations: Orientation.All
+
     id: page
     property bool deletingItems
     property Page rootPage
