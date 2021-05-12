@@ -9,6 +9,10 @@ This project was built during a project at the Université de Pau et des Pays de
 - Yoann Dumont
 - Louis Puyou
 
+# Contributors
+
+- Adel Noureddine (and maintainer)
+
 # License
 
 The project is licensed under the GNU GPL v3.
