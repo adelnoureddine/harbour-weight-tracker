@@ -12,6 +12,13 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
+* Sun May 15 2021 Adel Noureddine 0.0.3-1
+- Improve application cover
+- Fix scrollable pages
+- Rename database (old profiles won't be available anymore. Please recreate your profile)
+- Refactor code and separate database calls in js files
+- Add focus to textfields
+
 * Sun May 12 2021 Adel Noureddine 0.0.2-1
 - Allow float numbers for weight and height
 - Fix links in about page

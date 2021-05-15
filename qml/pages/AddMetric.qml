@@ -5,19 +5,17 @@ import QtQuick.LocalStorage 2.0
 Page {
     id: newMetric
     backNavigation: true
-
     allowedOrientations: Orientation.All
 
     property string metric_code;
     property string user_code;
-
 
     function addMetric(value){
         value = value.replace(',', '.');
         //load user_code from homepage, if(depth==3)adding from history else from homepage
         if(depth==3) user_code=previousPage().rootPage.user_code;
         else user_code=previousPage().user_code;
-        var db = LocalStorage.openDatabaseSync("ExampleDB", "1.0", "Database application", 100000);
+        var db = LocalStorage.openDatabaseSync("WeightTracker", "1.0", "Database application", 100000);
         db.transaction(
             function(tx){
                 var rs = tx.executeSql('SELECT MAX(METRIC_CODE) AS METRIC FROM METRICS ');
@@ -37,8 +35,6 @@ Page {
         //reload homepage if add from history page
         if(depth==3) previousPage().rootPage.load();
         navigateBack(PageStackAction.Animated);
-
-
     }
 
     SilicaFlickable {
@@ -61,6 +57,7 @@ Page {
                 EnterKey.iconSource: "image://theme/icon-m-enter-next"
                 EnterKey.onClicked: phoneField.focus = true
                 validator: RegExpValidator { regExp: /^\d+([\.|,]\d{1,2})?$/ }
+                focus: true
             }
             Button {
                 text: 'Add'
@@ -68,8 +65,6 @@ Page {
                 enabled:metricField.acceptableInput
                 onClicked: addMetric(metricField.text)
             }
-
-
         }
     }
 }

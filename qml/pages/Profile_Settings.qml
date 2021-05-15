@@ -23,7 +23,7 @@ Page {
     }
 
     function getLastname (){
-        var db = LocalStorage.openDatabaseSync("ExampleDB", "1.0", "Database application", 100000);
+        var db = LocalStorage.openDatabaseSync("WeightTracker", "1.0", "Database application", 100000);
         db.transaction(
             function(tx){
                 var rs = tx.executeSql('SELECT * FROM USERS WHERE USER_CODE=?',[user_code])
@@ -35,7 +35,7 @@ Page {
     }
 
     function getFirstname (){
-        var db = LocalStorage.openDatabaseSync("ExampleDB", "1.0", "Database application", 100000);
+        var db = LocalStorage.openDatabaseSync("WeightTracker", "1.0", "Database application", 100000);
         db.transaction(
             function(tx){
                 var rs = tx.executeSql('SELECT * FROM USERS WHERE USER_CODE=?',[user_code])
@@ -47,7 +47,7 @@ Page {
     }
 
     function getGender (){
-        var db = LocalStorage.openDatabaseSync("ExampleDB", "1.0", "Database application", 100000);
+        var db = LocalStorage.openDatabaseSync("WeightTracker", "1.0", "Database application", 100000);
         db.transaction(
             function(tx){
                 var rs = tx.executeSql('SELECT * FROM USERS WHERE USER_CODE=?',[user_code])
@@ -59,7 +59,7 @@ Page {
     }
 
     function getBirthday (){
-        var db = LocalStorage.openDatabaseSync("ExampleDB", "1.0", "Database application", 100000);
+        var db = LocalStorage.openDatabaseSync("WeightTracker", "1.0", "Database application", 100000);
         db.transaction(
             function(tx){
                 var rs = tx.executeSql('SELECT * FROM USERS WHERE USER_CODE=?',[user_code])
@@ -71,7 +71,7 @@ Page {
     }
 
     function getHeight (){
-        var db = LocalStorage.openDatabaseSync("ExampleDB", "1.0", "Database application", 100000);
+        var db = LocalStorage.openDatabaseSync("WeightTracker", "1.0", "Database application", 100000);
         db.transaction(
             function(tx){
                 var rs = tx.executeSql('SELECT * FROM USERS WHERE USER_CODE=?',[user_code])
@@ -84,7 +84,7 @@ Page {
 
     function updateLastname (lastname){
 
-        var db = LocalStorage.openDatabaseSync("ExampleDB", "1.0", "Database application", 100000);
+        var db = LocalStorage.openDatabaseSync("WeightTracker", "1.0", "Database application", 100000);
         db.transaction(
             function(tx){
                 tx.executeSql('UPDATE USERS SET LASTNAME=? WHERE USER_CODE=?',[lastname,user_code])
@@ -94,7 +94,7 @@ Page {
 
     }
     function updateFirstname (firstname){
-        var db = LocalStorage.openDatabaseSync("ExampleDB", "1.0", "Database application", 100000);
+        var db = LocalStorage.openDatabaseSync("WeightTracker", "1.0", "Database application", 100000);
         db.transaction(
             function(tx){
                 tx.executeSql('UPDATE USERS SET FIRSTNAME=? WHERE USER_CODE=?',[firstname,user_code])
@@ -103,7 +103,7 @@ Page {
         firstnameValue.text = firstname
     }
     function updateGender (gender){
-        var db = LocalStorage.openDatabaseSync("ExampleDB", "1.0", "Database application", 100000);
+        var db = LocalStorage.openDatabaseSync("WeightTracker", "1.0", "Database application", 100000);
         db.transaction(
             function(tx){
                 tx.executeSql('UPDATE USERS SET GENDER=? WHERE USER_CODE=?',[gender,user_code])
@@ -112,7 +112,7 @@ Page {
         genderValue.text = gender
     }
     function updateBirthday (birthday){
-        var db = LocalStorage.openDatabaseSync("ExampleDB", "1.0", "Database application", 100000);
+        var db = LocalStorage.openDatabaseSync("WeightTracker", "1.0", "Database application", 100000);
         db.transaction(
             function(tx){
                 tx.executeSql('UPDATE USERS SET BIRTHDAY=? WHERE USER_CODE=?',[birthday,user_code])
@@ -122,7 +122,7 @@ Page {
     }
     function updateHeight (height){
         height = height.replace(',', '.');
-        var db = LocalStorage.openDatabaseSync("ExampleDB", "1.0", "Database application", 100000);
+        var db = LocalStorage.openDatabaseSync("WeightTracker", "1.0", "Database application", 100000);
         db.transaction(
             function(tx){
                 tx.executeSql('UPDATE USERS SET HEIGHT=? WHERE USER_CODE=?',[height,user_code])
@@ -133,6 +133,7 @@ Page {
 
     SilicaFlickable {
         anchors.fill: parent
+        contentHeight: mainColumn.height
 
         PullDownMenu {
             MenuItem {
@@ -445,7 +446,7 @@ Page {
 
                     }
                     onAccepted: {
-                        var db = LocalStorage.openDatabaseSync("ExampleDB", "1.0", "Database application", 100000);
+                        var db = LocalStorage.openDatabaseSync("WeightTracker", "1.0", "Database application", 100000);
                         db.transaction(
                             function(tx){
                                 tx.executeSql('DELETE FROM METRICS WHERE USER_CODE=?',[user_code])

@@ -7,7 +7,7 @@ Page {
 
     SilicaFlickable {
         anchors.fill: parent
-        VerticalScrollDecorator {}
+        contentHeight: column.height
 
         Column {
             id: column

@@ -11,13 +11,14 @@ Page {
     property variant metric_tab: []
 
     function load(){
-    listModel.load()
-}
+        listModel.load()
+    }
 
     SilicaListView {
         id: listView
         model: listModel
         anchors.fill: parent
+
         header: PageHeader {
             title: qsTr("History")
         }
@@ -39,7 +40,7 @@ Page {
                     var remorse = Remorse.popupAction(
                                 page, "Cleared",
                                 function() {
-                                    var db = LocalStorage.openDatabaseSync("ExampleDB", "1.0", "Database application", 100000);
+                                    var db = LocalStorage.openDatabaseSync("WeightTracker", "1.0", "Database application", 100000);
                                     db.transaction(
                                         function(tx){
                                             tx.executeSql('DELETE FROM METRICS WHERE USER_CODE=?',[rootPage.user_code])
@@ -64,7 +65,7 @@ Page {
             id: list
             function remove() {
                 remorseDelete(function() {
-                    var db = LocalStorage.openDatabaseSync("ExampleDB", "1.0", "Database application", 100000);
+                    var db = LocalStorage.openDatabaseSync("WeightTracker", "1.0", "Database application", 100000);
                     db.transaction(
                         function(tx){
                             tx.executeSql('DELETE FROM METRICS WHERE METRIC_CODE=?',[metric_tab[index]])
@@ -76,7 +77,7 @@ Page {
             }
             function edit(value) {
                 value = value.replace(',', '.');
-                var db = LocalStorage.openDatabaseSync("ExampleDB", "1.0", "Database application", 100000);
+                var db = LocalStorage.openDatabaseSync("WeightTracker", "1.0", "Database application", 100000);
                 db.transaction(
                     function(tx){
                         tx.executeSql('UPDATE METRICS SET VAL=? WHERE METRIC_CODE=?',[parseFloat(value),metric_tab[index]])
@@ -138,6 +139,7 @@ Page {
                                 inputMethodHints: Qt.ImhFormattedNumbersOnly
                                 label: "kg"
                                 placeholderText: "Weight"
+                                focus: true
                                 EnterKey.iconSource: "image://theme/icon-m-enter-next"
                                 EnterKey.onClicked: phoneField.focus = true
                                 validator: RegExpValidator { regExp: /^\d+([\.|,]\d{1,2})?$/ }
@@ -148,8 +150,8 @@ Page {
             }
 
         }
-        VerticalScrollDecorator {}
     }
+
     ListModel {
         id: listModel
 
@@ -165,7 +167,7 @@ Page {
 
         function load() {
             listModel.clear()
-            var db = LocalStorage.openDatabaseSync("ExampleDB", "1.0", "Database application", 100000);
+            var db = LocalStorage.openDatabaseSync("WeightTracker", "1.0", "Database application", 100000);
             db.transaction(
                 function(tx){
 

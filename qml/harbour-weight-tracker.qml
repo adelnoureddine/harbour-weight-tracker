@@ -3,7 +3,6 @@ import Sailfish.Silica 1.0
 import "pages"
 import QtQuick.LocalStorage 2.0
 
-
 ApplicationWindow
 {
     initialPage: Component { FirstPage { } }
@@ -18,7 +17,7 @@ ApplicationWindow
     }
 
     function createLastUser() {
-        var db = LocalStorage.openDatabaseSync("ExampleDB", "1.0", "Database application", 100000);
+        var db = LocalStorage.openDatabaseSync("WeightTracker", "1.0", "Database application", 100000);
 
         var createUsersTable = 'CREATE TABLE IF NOT EXISTS SETTINGS(
                                     USER_CODE INTEGER NOT NULL,
@@ -33,7 +32,7 @@ ApplicationWindow
 
 
     function setProfil() {
-        var db = LocalStorage.openDatabaseSync("ExampleDB", "1.0", "Database application", 100000);
+        var db = LocalStorage.openDatabaseSync("WeightTracker", "1.0", "Database application", 100000);
 
         var createUsersTable = 'CREATE TABLE IF NOT EXISTS USERS(
                                     USER_CODE INTEGER NOT NULL,
@@ -52,7 +51,7 @@ ApplicationWindow
     }
 
     function setMetric() {
-        var db = LocalStorage.openDatabaseSync("ExampleDB", "1.0", "Database application", 100000);
+        var db = LocalStorage.openDatabaseSync("WeightTracker", "1.0", "Database application", 100000);
 
         var createMetricsTable = 'CREATE TABLE IF NOT EXISTS METRICS(
                                        USER_CODE INTEGER NOT NULL,

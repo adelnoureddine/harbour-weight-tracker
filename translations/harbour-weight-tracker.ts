@@ -16,18 +16,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Manon Sauvageot</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Yoann Dumont</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Louis Puyou</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Source Code</source>
         <translation type="unfinished"></translation>
     </message>
@@ -44,23 +32,15 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Maintainer</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Adel Noureddine</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Contributors</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Translators</source>
+        <source>Manon Sauvageot, Yoann Dumont, and Louis Puyou</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>XXX XXX</source>
+        <source>Adel Noureddine (and maintainer)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
