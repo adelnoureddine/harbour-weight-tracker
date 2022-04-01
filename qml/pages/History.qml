@@ -20,7 +20,7 @@ Page {
         anchors.fill: parent
 
         header: PageHeader {
-            title: qsTr("History")
+            title: qsTr("All weight data")
         }
 
         ViewPlaceholder {
@@ -33,7 +33,7 @@ Page {
             id: pullDownMenu
 
             MenuItem {
-                text: "Clear History"
+                text: "Clear all data"
                 visible: listView.count
                 onClicked: {
                     page.deletingItems = true
@@ -53,7 +53,7 @@ Page {
                 }
             }
             MenuItem {
-                text: "Add Metric"
+                text: "Add weight data"
                 onClicked: pageStack.animatorPush(Qt.resolvedUrl('./AddMetric.qml'))
             }
             MenuLabel {
@@ -131,7 +131,7 @@ Page {
                             width: parent.width
                             spacing: Theme.paddingLarge
 
-                            DialogHeader { title: 'Edit this metric:' }
+                            DialogHeader { title: 'Edit this weight data:' }
 
                             TextField {
                                 id: metricField

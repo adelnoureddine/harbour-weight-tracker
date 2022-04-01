@@ -20,15 +20,14 @@ DISTFILES += qml/harbour-weight-tracker.qml \
     qml/cover/CoverPage.qml \
     qml/pages/About.qml \
     qml/pages/AddMetric.qml \
-    qml/pages/FirstPage.qml \
     qml/pages/History.qml \
+    qml/pages/MainPage.qml \
     qml/pages/Profile_Settings.qml \
     qml/js/utils.js \
     rpm/harbour-weight-tracker.changes \
     rpm/harbour-weight-tracker.changes.run.in \
     rpm/harbour-weight-tracker.spec \
     rpm/harbour-weight-tracker.yaml \
-    translations/*.ts \
     harbour-weight-tracker.desktop
 
 SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172

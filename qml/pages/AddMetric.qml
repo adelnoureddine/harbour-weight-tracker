@@ -46,7 +46,7 @@ Page {
             width: parent.width
             spacing: Theme.paddingLarge
 
-            PageHeader { title: 'Add new metric' }
+            PageHeader { title: 'Add new weight data' }
 
             TextField {
                 id: metricField

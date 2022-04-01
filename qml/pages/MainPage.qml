@@ -20,6 +20,7 @@ Page {
     property double recommended_max_weight: 0.0;
     property string recommended_weight_description;
     property string category_bmi;
+    property string category_bmi_icon;
     property string category_bmi_description;
     property string slider_color;
     property bool profiles;
@@ -73,30 +74,37 @@ Page {
         if (bmi < 18.5) {
             category_bmi = "Underweight";
             slider_color = "#2eb3db";
+            category_bmi_icon = "image://theme/icon-l-weather-n211-light"
             category_bmi_description = "Your weight is under the recommended values. Talk to your doctor for medical advice."
         } else if (bmi < 25) {
             category_bmi = "Normal weight";
             slider_color = "#14f52a";
+            category_bmi_icon = "image://theme/icon-l-weather-d000-light"
             category_bmi_description = "Your weight is in the normal category for adults of your height."
         } else if (bmi < 30) {
             category_bmi = "Overweight (pre-obesity)";
             slider_color = "yellow";
+            category_bmi_icon = "image://theme/icon-l-weather-d210-light"
             category_bmi_description = "Your weight is above the recommended values. Talk to your doctor for medical advice."
         } else if (bmi < 35) {
             category_bmi = "Obese Class I";
             slider_color = "orange";
+            category_bmi_icon = "image://theme/icon-l-weather-d220-light"
             category_bmi_description = "Your weight is high above the recommended values. People who are overweight or obese are at higher risk for chronic conditions such as high blood pressure, diabetes, and high cholesterol. Talk to your doctor for medical advice."
         } else if (bmi < 40) {
             category_bmi = "Obese Class II";
             slider_color = "red";
+            category_bmi_icon = "image://theme/icon-l-weather-d221-light"
             category_bmi_description = "Your weight is high above the recommended values. People who are overweight or obese are at higher risk for chronic conditions such as high blood pressure, diabetes, and high cholesterol. Talk to your doctor for medical advice."
         } else if (bmi >= 40) {
             category_bmi = "Obese Class III";
             slider_color = "red";
+            category_bmi_icon = "image://theme/icon-l-weather-d431-light"
             category_bmi_description = "Your weight is high above the recommended values. People who are overweight or obese are at higher risk for chronic conditions such as high blood pressure, diabetes, and high cholesterol. Talk to your doctor for medical advice."
         } else {
             category_bmi = "Unkown category";
             slider_color = "white";
+            category_bmi_icon = "image://theme/icon-l-clear"
             category_bmi_description = ""
         }
     }
@@ -110,23 +118,23 @@ Page {
                 onClicked: pageStack.animatorPush(Qt.resolvedUrl('./About.qml'))
             }
             MenuItem {
-                visible: user_code!=''
-                text: "Settings"
-                onClicked: pageStack.animatorPush(Qt.resolvedUrl('./Profile_Settings.qml'))
-            }
-            MenuItem {
                 visible: profiles==true
                 text: "Change Profile"
                 onClicked: pageStack.animatorPush(changeProfile)
             }
             MenuItem {
                 visible: user_code!=''
-                text: "History"
+                text: "Profile Settings"
+                onClicked: pageStack.animatorPush(Qt.resolvedUrl('./Profile_Settings.qml'))
+            }
+            MenuItem {
+                visible: user_code!=''
+                text: "All Weight Data"
                 onClicked: pageStack.animatorPush(Qt.resolvedUrl('./History.qml'))
             }
             MenuItem {
                 visible: user_code!=''
-                text: "Add metric"
+                text: "Add Weight"
                 onClicked: pageStack.animatorPush(Qt.resolvedUrl('./AddMetric.qml'))
             }
             MenuItem {
@@ -182,8 +190,8 @@ Page {
 
              ViewPlaceholder {
                  enabled: wtData.weight==0 && user_code!=''
-                 text: "No metrics avaible"
-                 hintText: "Pull down to add metrics"
+                 text: "No data available"
+                 hintText: "Pull down to add a new weight data"
              }
 
              // Weight
@@ -221,6 +229,13 @@ Page {
                  backgroundColor: slider_color
                  color: slider_color
             }
+
+            Icon {
+                 source: category_bmi_icon
+                 anchors {
+                     horizontalCenter: parent.horizontalCenter
+                 }
+             }
 
              // Description
              Label {

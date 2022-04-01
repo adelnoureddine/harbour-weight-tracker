@@ -12,12 +12,8 @@
 # * date Author's Name <author's email> version-release
 # - Summary of changes
 
-* Sun May 15 2021 Adel Noureddine 0.0.3-1
-- Improve application cover
-- Fix scrollable pages
-- Rename database (old profiles won't be available anymore. Please recreate your profile)
-- Refactor code and separate database calls in js files
-- Add focus to textfields
+* Sun May 03 2021 Adel Noureddine 0.0.1-1
+- First release
 
 * Sun May 12 2021 Adel Noureddine 0.0.2-1
 - Allow float numbers for weight and height
@@ -26,5 +22,17 @@
 - Allow all orientations
 - UI improvements
 
-* Sun May 03 2021 Adel Noureddine 0.0.1-1
-- First release
+* Sun May 15 2021 Adel Noureddine 0.0.3-1
+- Improve application cover
+- Fix scrollable pages
+- Rename database (old profiles won't be available anymore. Please recreate your profile)
+- Refactor code and separate database calls in js files
+- Add focus to textfields
+
+* Fri Apr 01 2022 Adel Noureddine 1.3-1
+- Support SailJail
+- Add icons for each BMI category
+- Update link for source code
+- Fix typos
+- Update application icon
+- Improve cover page

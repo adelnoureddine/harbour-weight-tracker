@@ -32,30 +32,50 @@ Page {
             }
 
             SectionHeader {
-                text: qsTr("Authors")
+                text: qsTr("Maintainer and Current Developer")
             }
 
             Label {
                 wrapMode: Text.Wrap
                 x: Theme.horizontalPageMargin
-                text: qsTr("Manon Sauvageot, Yoann Dumont, and Louis Puyou")
+                text: qsTr("Adel Noureddine © 2021-2022")
                 font.pixelSize: Theme.fontSizeSmall
                 anchors {
                     horizontalCenter: parent.horizontalCenter
                 }
             }
 
+
             SectionHeader {
-                text: qsTr("Contributors")
+                text: qsTr("Initial Authors")
             }
 
-            Label {
-                wrapMode: Text.Wrap
-                x: Theme.horizontalPageMargin
-                text: qsTr("Adel Noureddine (and maintainer)")
-                font.pixelSize: Theme.fontSizeSmall
-                anchors {
-                    horizontalCenter: parent.horizontalCenter
+            Column {
+
+                width: parent.width
+
+                Label {
+                    text: "Manon Sauvageot © 2021"
+                    font.pixelSize: Theme.fontSizeSmall
+                    anchors {
+                        horizontalCenter: parent.horizontalCenter
+                    }
+                }
+
+                Label {
+                    text: "Yoann Dumont © 2021"
+                    font.pixelSize: Theme.fontSizeSmall
+                    anchors {
+                        horizontalCenter: parent.horizontalCenter
+                    }
+                }
+
+                Label {
+                    text: "Louis Puyou © 2021"
+                    font.pixelSize: Theme.fontSizeSmall
+                    anchors {
+                        horizontalCenter: parent.horizontalCenter
+                    }
                 }
             }
 
@@ -70,6 +90,13 @@ Page {
                     horizontalCenter: parent.horizontalCenter
                 }
             }
+
+            Icon {
+                 source: "image://theme/icon-s-cloud-download"
+                 anchors {
+                     horizontalCenter: parent.horizontalCenter
+                 }
+             }
 
             Text {
                 text: "<a href=\"https://gitlab.com/adelnoureddine/harbour-weight-tracker\">" + qsTr("View source code on GitLab") + "</a>"

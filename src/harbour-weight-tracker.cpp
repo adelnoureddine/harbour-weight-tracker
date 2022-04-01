@@ -2,6 +2,8 @@
 #include <QtQuick>
 #endif
 
+#include <QCoreApplication>
+
 #include <sailfishapp.h>
 
 int main(int argc, char *argv[])
@@ -15,6 +17,9 @@ int main(int argc, char *argv[])
     //   - SailfishApp::pathToMainQml() to get a QUrl to the main QML file
     //
     // To display the view, call "show()" (will show fullscreen on device).
+
+    QCoreApplication::setOrganizationName("org.noureddine");
+    QCoreApplication::setApplicationName("WeightTracker");
 
     return SailfishApp::main(argc, argv);
 }

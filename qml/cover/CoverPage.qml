@@ -15,11 +15,20 @@ CoverBackground {
         label_bmi.text = "BMI: " + WtData.bmi.toFixed(2);
     }
 
+    Image {
+        id: app_icon
+        source: "harbour-weight-tracker.png"
+        anchors.top: parent.top
+        anchors.topMargin: 15
+        anchors.horizontalCenter: parent.horizontalCenter
+        opacity: 0.5
+    }
+
     Label {
         id: label_first_name
-        anchors.top: parent.top
+        anchors.top: app_icon.bottom
         text: "First"
-        anchors.topMargin: 30
+        anchors.topMargin: 15
         font.pixelSize: Theme.fontSizeLarge
         anchors.horizontalCenter: parent.horizontalCenter
     }
@@ -36,7 +45,7 @@ CoverBackground {
         id: label_weight
         anchors.top: label_last_name.bottom
         text: "Weight"
-        anchors.topMargin: 30
+        anchors.topMargin: 15
         font.pixelSize: Theme.fontSizeExtraLarge
         anchors.horizontalCenter: parent.horizontalCenter
     }
@@ -45,7 +54,7 @@ CoverBackground {
         id: label_bmi
         anchors.top: label_weight.bottom
         text: "BMI"
-        anchors.topMargin: 30
+        anchors.topMargin: 15
         font.pixelSize: Theme.fontSizeLarge
         anchors.horizontalCenter: parent.horizontalCenter
     }
