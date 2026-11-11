@@ -4,8 +4,13 @@ X-Nemo-Application-Type=silica-qt5
 Icon=harbour-weight-tracker
 Exec=harbour-weight-tracker
 Name=Weight Tracker
+Name[fr]=Suivi du poids
+Comment=Track your weight and your BMI
+Comment[fr]=Suivez votre poids et votre IMC
 
+# ApplicationName is misspelt on purpose: version 1.3 shipped with it, and Sailjail
+# names the app's data folder after it. See src/harbour-weight-tracker.cpp.
 [X-Sailjail]
-Permissions=
 OrganizationName=org.noureddine
 ApplicationName=WeighTracker
+Permissions=Documents;Downloads;RemovableMedia

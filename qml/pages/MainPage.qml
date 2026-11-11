@@ -1,443 +1,509 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-import QtQuick.LocalStorage 2.0
+import "../components"
+import "../js/Database.js" as Database
+import "../js/bmi.js" as Bmi
+import "../js/utils.js" as Utils
 
-import "../js/utils.js" as WtUtils
-
+/*
+ * The profile shown, as Health's dashboard shows it: the latest weight with its trend,
+ * the height and the BMI, each opening its own page.
+ */
 Page {
-    id: root
+    id: page
+
     allowedOrientations: Orientation.All
 
-    property variant usercodes: []
-    property int currentProfileIndex
-    property string user_description;
-    property string u_height;
-    property string u_weight;
-    property string user_code;
-    property double bmi: 0.0;
-    property double height_square: 0.0;
-    property double recommended_min_weight: 0.0;
-    property double recommended_max_weight: 0.0;
-    property string recommended_weight_description;
-    property string category_bmi;
-    property string category_bmi_icon;
-    property string category_bmi_description;
-    property string slider_color;
-    property bool profiles;
-    property variant wtData;
+    property var profile: null
+    property int profileCount: 0
+    property var latest: null
+    property var trend: []
+    property string changeText: ""
+    property var bmi: null
+    property int category: -1
+    property string todayText: ""
 
-    function getProfiles(){
-        var db = LocalStorage.openDatabaseSync("WeightTracker", "1.0", "Database application", 100000);
-        db.transaction(
-            function(tx){
-                var rs = tx.executeSql('SELECT * FROM USERS');
-                if(rs.rows.length > 0){
-                    profiles = true;
-                }
-                else profiles=false;
-        })
+    // Lines stay a readable length in landscape and on tablets.
+    readonly property real contentWidth: Math.min(width, Screen.width * 1.25)
+    readonly property bool usable: appWindow.ready && appWindow.databaseError === ""
+
+    function refresh() {
+        todayText = Utils.longDate(new Date());
+        if (!usable) {
+            return;
+        }
+        profileCount = Database.profiles().length;
+        profile = appWindow.profileId >= 0 ? Database.profile(appWindow.profileId) : null;
+        latest = profile ? Database.latestWeight(profile.code) : null;
+        var points = profile ? Database.series(profile.code, 30) : [];
+        // A month with fewer than two weights: the last ten, however old.
+        if (profile && points.length < 2) {
+            points = Database.series(profile.code, 0).slice(-10);
+        }
+        trend = points;
+        changeText = Utils.changeSinceText(points);
+        bmi = latest && profile.height !== null ? Bmi.compute(profile.height, latest.value) : null;
+        category = Bmi.category(bmi);
     }
 
-    function load() {
-        wtData = WtUtils.info_user(user_code);
-
-        user_description = "Welcome " + wtData.firstname + " " + wtData.lastname + "!"
-        u_height = " Height: " + wtData.height + " cm"
-        u_weight = " Weight: " + wtData.weight + " kg"
-
-        calculate();
-        getProfiles();
+    function openAddWeight() {
+        pageStack.animatorPush(Qt.resolvedUrl("WeightDialog.qml"), { profileId: appWindow.profileId });
     }
 
-    function loadUser(val) {
-        user_code=val;
-        var db = LocalStorage.openDatabaseSync("WeightTracker", "1.0", "Database application", 100000);
-        db.transaction(
-            function(tx){
-                tx.executeSql('UPDATE SETTINGS USER_CODE=?',[user_code]);
-            })
+    function openProfile(code) {
+        pageStack.animatorPush(Qt.resolvedUrl("ProfileDialog.qml"), { profileCode: code });
     }
 
-    function calculate() {
-        var user_height = wtData.height / 100
-        height_square = (user_height * user_height)
-        if ((wtData.weight > 0) && (user_height > 0)) {
-            bmi = wtData.weight / height_square;
-            recommended_min_weight = 18.5 * height_square
-            recommended_max_weight = 24.9 * height_square
-            recommended_weight_description = "The recommended weight for your height is between " + recommended_min_weight.toFixed(2) + " kg and " + recommended_max_weight.toFixed(2) + " kg"
-            calculate_bmi_category();
+    Connections {
+        target: appWindow
+        onRevisionChanged: page.refresh()
+        onReadyChanged: page.refresh()
+        onProfileIdChanged: page.refresh()
+    }
+
+    // "Measured today" becomes "Measured yesterday" overnight.
+    onStatusChanged: {
+        if (status === PageStatus.Active) {
+            refresh();
         }
     }
-
-    function calculate_bmi_category() {
-        if (bmi < 18.5) {
-            category_bmi = "Underweight";
-            slider_color = "#2eb3db";
-            category_bmi_icon = "image://theme/icon-l-weather-n211-light"
-            category_bmi_description = "Your weight is under the recommended values. Talk to your doctor for medical advice."
-        } else if (bmi < 25) {
-            category_bmi = "Normal weight";
-            slider_color = "#14f52a";
-            category_bmi_icon = "image://theme/icon-l-weather-d000-light"
-            category_bmi_description = "Your weight is in the normal category for adults of your height."
-        } else if (bmi < 30) {
-            category_bmi = "Overweight (pre-obesity)";
-            slider_color = "yellow";
-            category_bmi_icon = "image://theme/icon-l-weather-d210-light"
-            category_bmi_description = "Your weight is above the recommended values. Talk to your doctor for medical advice."
-        } else if (bmi < 35) {
-            category_bmi = "Obese Class I";
-            slider_color = "orange";
-            category_bmi_icon = "image://theme/icon-l-weather-d220-light"
-            category_bmi_description = "Your weight is high above the recommended values. People who are overweight or obese are at higher risk for chronic conditions such as high blood pressure, diabetes, and high cholesterol. Talk to your doctor for medical advice."
-        } else if (bmi < 40) {
-            category_bmi = "Obese Class II";
-            slider_color = "red";
-            category_bmi_icon = "image://theme/icon-l-weather-d221-light"
-            category_bmi_description = "Your weight is high above the recommended values. People who are overweight or obese are at higher risk for chronic conditions such as high blood pressure, diabetes, and high cholesterol. Talk to your doctor for medical advice."
-        } else if (bmi >= 40) {
-            category_bmi = "Obese Class III";
-            slider_color = "red";
-            category_bmi_icon = "image://theme/icon-l-weather-d431-light"
-            category_bmi_description = "Your weight is high above the recommended values. People who are overweight or obese are at higher risk for chronic conditions such as high blood pressure, diabetes, and high cholesterol. Talk to your doctor for medical advice."
-        } else {
-            category_bmi = "Unkown category";
-            slider_color = "white";
-            category_bmi_icon = "image://theme/icon-l-clear"
-            category_bmi_description = ""
-        }
-    }
+    Component.onCompleted: refresh()
 
     SilicaFlickable {
         anchors.fill: parent
+        contentHeight: column.height + Theme.paddingLarge
 
         PullDownMenu {
             MenuItem {
-                text: "About"
-                onClicked: pageStack.animatorPush(Qt.resolvedUrl('./About.qml'))
+                text: qsTr("About")
+                onClicked: pageStack.animatorPush(Qt.resolvedUrl("AboutPage.qml"))
             }
             MenuItem {
-                visible: profiles==true
-                text: "Change Profile"
-                onClicked: pageStack.animatorPush(changeProfile)
+                visible: page.usable
+                text: page.profileCount > 0 ? qsTr("Profiles") : qsTr("Create a profile")
+                onClicked: page.profileCount > 0 ? pageStack.animatorPush(Qt.resolvedUrl("ProfilesPage.qml"))
+                                                 : page.openProfile(-1)
             }
             MenuItem {
-                visible: user_code!=''
-                text: "Profile Settings"
-                onClicked: pageStack.animatorPush(Qt.resolvedUrl('./Profile_Settings.qml'))
+                visible: page.usable
+                text: qsTr("Backup and export")
+                onClicked: pageStack.animatorPush(Qt.resolvedUrl("DataPage.qml"))
             }
+            // Last: closest to the finger.
             MenuItem {
-                visible: user_code!=''
-                text: "All Weight Data"
-                onClicked: pageStack.animatorPush(Qt.resolvedUrl('./History.qml'))
+                visible: page.usable && page.profile !== null
+                text: qsTr("Add weight")
+                onClicked: page.openAddWeight()
             }
-            MenuItem {
-                visible: user_code!=''
-                text: "Add Weight"
-                onClicked: pageStack.animatorPush(Qt.resolvedUrl('./AddMetric.qml'))
-            }
-            MenuItem {
-                visible: user_code=='' && profiles ==false
-                text: "Create Profile"
-                onClicked:pageStack.animatorPush(createProfile)
-            }
-
-            MenuLabel { text: "Menu" }
         }
 
-        contentHeight: column.height
+        Column {
+            id: column
 
-         Column {
-             id: column
-             x: Theme.paddingLarge
-             width: parent.width - 2*x
-             spacing: Theme.paddingLarge
-             PageHeader { title: "Weight Tracker"}
+            anchors.horizontalCenter: parent.horizontalCenter
+            width: page.contentWidth
+            spacing: Theme.paddingMedium
 
+            // Profile name, today's date and an initial. Tapping it switches profile.
+            BackgroundItem {
+                id: header
+                width: parent.width
+                height: Math.max(Theme.itemSizeLarge, headerText.height + 2 * Theme.paddingLarge)
+                enabled: page.profileCount > 0
+                onClicked: pageStack.animatorPush(Qt.resolvedUrl("ProfilesPage.qml"))
 
+                Rectangle {
+                    id: avatar
+                    anchors.right: parent.right
+                    anchors.rightMargin: Theme.horizontalPageMargin
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: page.profile !== null
+                    width: Theme.itemSizeSmall
+                    height: width
+                    radius: width / 2
+                    color: Theme.rgba(Theme.highlightColor, 0.3)
 
+                    Label {
+                        anchors.centerIn: parent
+                        text: page.profile ? Utils.initials(page.profile.firstName, "") : ""
+                        font.pixelSize: Theme.fontSizeLarge
+                        color: Theme.highlightColor
+                    }
+                }
 
-             ViewPlaceholder {
-                 enabled: user_code=='' && profiles==false
-                 text: "No profile created"
-                 hintText: "Swipe down to create one !"
-             }
+                Column {
+                    id: headerText
+                    anchors.right: avatar.visible ? avatar.left : parent.right
+                    anchors.rightMargin: avatar.visible ? Theme.paddingLarge : Theme.horizontalPageMargin
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                           - (avatar.visible ? avatar.width + Theme.paddingLarge : 0)
 
-             ViewPlaceholder {
-                 enabled: user_code=='' && profiles==true
-                 text: "No profile selected"
-                 hintText: "Swipe down to select one !"
-             }
-            //Welcome user
-             Label {
-                 visible: user_code!=''
-                 x: Theme.horizontalPageMargin
-                 width: parent.width
-                 text: user_description
-                 color: Theme.highlightColor
-                 font.pixelSize: Theme.fontSizeLarge
-             }
-
-             // Height
-             Label {
-                 visible: user_code!=''
-                 wrapMode: Text.Wrap
-                 width: parent.width
-                 text: u_height
-                 color: 'white'
-             }
-
-             ViewPlaceholder {
-                 enabled: wtData.weight==0 && user_code!=''
-                 text: "No data available"
-                 hintText: "Pull down to add a new weight data"
-             }
-
-             // Weight
-             Label {
-                 visible: wtData.weight!==0
-                 wrapMode: Text.Wrap
-                 width: parent.width
-                 text: u_weight
-                 color: 'white'
-             }
-
-             // BMI value
-             Label {
-                 visible: wtData.weight!==0
-                 text: "Your BMI is"
-                 color: Theme.highlightColor
-                 font.pixelSize: Theme.fontSizeLarge
-                 anchors.left: parent.left
-                 anchors.leftMargin: 30
-             }
-
-             Slider {
-                 visible: wtData.weight!==0
-                 id: changingSlider
-                 value: bmi
-                 minimumValue: 0
-                 maximumValue: 50
-                 stepSize: 10
-                 width: parent.width
-                 handleVisible: false
-                 enabled: handleVisible
-                 valueText : bmi.toFixed(2)
-                 label: category_bmi
-                 valueLabelColor: slider_color
-                 backgroundColor: slider_color
-                 color: slider_color
+                    Label {
+                        width: parent.width
+                        horizontalAlignment: Text.AlignRight
+                        truncationMode: TruncationMode.Fade
+                        //: The app's name, at the top of the main page before a profile exists
+                        text: page.profile ? page.profile.firstName : qsTr("Weight Tracker")
+                        font.pixelSize: Theme.fontSizeExtraLarge
+                        font.family: Theme.fontFamilyHeading
+                        color: Theme.highlightColor
+                    }
+                    Label {
+                        width: parent.width
+                        horizontalAlignment: Text.AlignRight
+                        truncationMode: TruncationMode.Fade
+                        text: page.todayText
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: header.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor
+                    }
+                }
             }
 
-            Icon {
-                 source: category_bmi_icon
-                 anchors {
-                     horizontalCenter: parent.horizontalCenter
-                 }
-             }
+            Item { width: 1; height: Theme.paddingSmall }
 
-             // Description
-             Label {
-                 visible: wtData.weight!==0
-                 text: "Description"
-                 color: Theme.highlightColor
-                 font.pixelSize: Theme.fontSizeLarge
-                 anchors.left: parent.left
-                 anchors.leftMargin: 30
-             }
+            // The database could not be opened.
+            Card {
+                visible: appWindow.databaseError !== ""
 
-             // Recommended weight
-             Label {
-                 visible: wtData.weight!==0
-                 wrapMode: Text.Wrap
-                 width: parent.width
-                 text: recommended_weight_description
-                 color: 'white'
-             }
+                Row {
+                    width: parent.width
+                    spacing: Theme.paddingMedium
+                    Icon {
+                        id: errorIcon
+                        source: "image://theme/icon-m-warning"
+                        color: Theme.highlightColor
+                    }
+                    Label {
+                        width: parent.width - errorIcon.width - parent.spacing
+                        anchors.verticalCenter: parent.verticalCenter
+                        wrapMode: Text.Wrap
+                        text: appWindow.databaseError
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.highlightColor
+                    }
+                }
+            }
 
-             // BMI category description
-             Label {
-                 visible: wtData.weight!==0
-                 wrapMode: Text.Wrap
-                 width: parent.width
-                 text: category_bmi_description
-                 color: 'white'
-             }
+            // No profile yet: where to start.
+            Card {
+                visible: page.usable && page.profileCount === 0
+                spacing: Theme.paddingMedium
 
-             Component {
-                 id: createProfile
+                Label {
+                    width: parent.width
+                    wrapMode: Text.Wrap
+                    text: qsTr("Welcome")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.secondaryHighlightColor
+                }
+                Label {
+                    width: parent.width
+                    wrapMode: Text.Wrap
+                    text: qsTr("Create a profile to start tracking your weight. Everyone in the family can have their own. Your data stays on this phone.")
+                    font.pixelSize: Theme.fontSizeSmall
+                    color: Theme.primaryColor
+                }
+                Item { width: 1; height: Theme.paddingSmall }
+                Button {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    preferredWidth: Theme.buttonWidthLarge
+                    text: qsTr("Create a profile")
+                    onClicked: page.openProfile(-1)
+                }
+                Button {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    preferredWidth: Theme.buttonWidthLarge
+                    text: qsTr("Restore a backup")
+                    onClicked: pageStack.animatorPush(Qt.resolvedUrl("DataPage.qml"))
+                }
+            }
 
-                 Dialog {
-                     canAccept: lastnameField.text!="" && firstnameField.text!="" && genderField.text!="" && birthdayField.value!="" && heightField.acceptableInput
-                     acceptDestination: root
+            // A birthday version 1.x stored in a form that could not be read back.
+            BackgroundItem {
+                id: birthdayWarning
+                visible: page.profile !== null && !page.profile.birthdayValid
+                width: parent.width
+                height: warningRow.height + 2 * Theme.paddingLarge
+                highlightedColor: "transparent"
+                onClicked: page.openProfile(page.profile.code)
 
-                     acceptDestinationAction: PageStackAction.Pop
+                CardBackground {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    height: parent.height
+                    highlighted: birthdayWarning.highlighted
+                }
+                Row {
+                    id: warningRow
+                    x: Theme.horizontalPageMargin + Theme.paddingLarge
+                    y: Theme.paddingLarge
+                    width: parent.width - 2 * x
+                    spacing: Theme.paddingMedium
+                    Icon {
+                        id: warningIcon
+                        source: "image://theme/icon-m-warning"
+                        color: Theme.highlightColor
+                    }
+                    Label {
+                        width: parent.width - warningIcon.width - parent.spacing
+                        anchors.verticalCenter: parent.verticalCenter
+                        wrapMode: Text.Wrap
+                        text: qsTr("The birthday of this profile could not be read. Tap to pick it again.")
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: Theme.highlightColor
+                    }
+                }
+            }
 
-                     onAcceptPendingChanged: {
-                         if (acceptPending) {
-                             var db = LocalStorage.openDatabaseSync("WeightTracker", "1.0", "Database application", 100000);
-                             db.transaction(
-                                 function(tx){
-                                     var code
-                                     var rs = tx.executeSql('SELECT MAX(USER_CODE) AS USER_CODE FROM USERS');
-                                     if(rs.rows.item(0)===null) code = 1
-                                     else{
-                                         code = (rs.rows.item(0).USER_CODE) + 1;
-                                     }
-                                     tx.executeSql('INSERT INTO USERS VALUES (?,?,?,?,?,?)',[code,lastnameField.text,firstnameField.text,genderField.currentItem.text,birthdayField.value,heightField.text]);
-                                     rs = tx.executeSql('SELECT * FROM SETTINGS');
-                                     if(rs.rows.length===0) tx.executeSql('INSERT INTO SETTINGS VALUES (?)',[code]);
-                                     else tx.executeSql('UPDATE SETTINGS SET USER_CODE=?',[code]);
+            // --- weight: the latest, its change and its trend ------------------------
+            BackgroundItem {
+                id: weightCard
+                visible: page.profile !== null
+                width: parent.width
+                height: weightColumn.height + 2 * Theme.paddingLarge
+                highlightedColor: "transparent"
+                onClicked: pageStack.animatorPush(Qt.resolvedUrl("WeightPage.qml"))
 
-                                     user_code=code;
-                                 }
-                             )
-                             root.load()
-                             load()
-                         }
-                     }
+                CardBackground {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    height: parent.height
+                    highlighted: weightCard.highlighted
+                    subtle: page.latest === null
+                }
 
-                     Flickable {
-                         // ComboBox requires a flickable ancestor
-                         width: parent.width
-                         height: parent.height
-                         interactive: false
+                Column {
+                    id: weightColumn
+                    x: Theme.horizontalPageMargin + Theme.paddingLarge
+                    y: Theme.paddingLarge
+                    width: parent.width - 2 * x
+                    spacing: Theme.paddingSmall
 
-                         Column {
-                             width: parent.width
+                    Item {
+                        width: parent.width
+                        height: Theme.iconSizeSmall
+                        HighlightImage {
+                            id: weightIcon
+                            width: Theme.iconSizeSmall
+                            height: Theme.iconSizeSmall
+                            sourceSize.width: Theme.iconSizeSmall
+                            sourceSize.height: Theme.iconSizeSmall
+                            source: Qt.resolvedUrl("../icons/weight.svg")
+                            color: Theme.secondaryHighlightColor
+                            highlighted: weightCard.highlighted
+                        }
+                        Label {
+                            anchors.left: weightIcon.right
+                            anchors.leftMargin: Theme.paddingSmall
+                            anchors.right: weightWhen.left
+                            anchors.rightMargin: Theme.paddingSmall
+                            anchors.verticalCenter: parent.verticalCenter
+                            truncationMode: TruncationMode.Fade
+                            text: qsTr("Weight")
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: Theme.secondaryHighlightColor
+                        }
+                        Label {
+                            id: weightWhen
+                            anchors.right: parent.right
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: page.latest ? Utils.measuredWhen(page.latest.date) : ""
+                            font.pixelSize: Theme.fontSizeExtraSmall
+                            color: weightCard.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor
+                        }
+                    }
 
-                             DialogHeader {
-                                 title: "Create your profile"
-                             }
-                             TextField{
-                                 id : firstnameField
-                                 width:parent.width
-                                 label: "First name";
-                                 placeholderText: label
-                             }
-                             TextField{
-                                 id : lastnameField
-                                 width:parent.width
-                                 label: "Last name";
-                                 placeholderText: label
-                             }
-                             ComboBox {
-                                 id:genderField
-                                 label: "Gender"
-                                 menu: ContextMenu {
-                                     MenuItem { text: "F" }
-                                     MenuItem { text: "M" }
-                                 }
-                                 width: parent.width/2
-                             }
-                             ValueButton {
-                                 property date selectedDate
+                    Item {
+                        width: parent.width
+                        height: weightValue.height
+                        visible: page.latest !== null
+                        Label {
+                            id: weightValue
+                            text: page.latest ? Utils.formatValue(page.latest.value, 1) : ""
+                            font.pixelSize: Theme.fontSizeHuge
+                            color: weightCard.highlighted ? Theme.highlightColor : Theme.primaryColor
+                        }
+                        Label {
+                            anchors.left: weightValue.right
+                            anchors.leftMargin: Theme.paddingSmall
+                            anchors.baseline: weightValue.baseline
+                            //: Unit: kilograms
+                            text: qsTr("kg")
+                            font.pixelSize: Theme.fontSizeMedium
+                            color: weightCard.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor
+                        }
+                        Label {
+                            anchors.right: parent.right
+                            anchors.baseline: weightValue.baseline
+                            text: page.changeText
+                            font.pixelSize: Theme.fontSizeSmall
+                            color: weightCard.highlighted ? Theme.highlightColor : Theme.primaryColor
+                        }
+                    }
 
-                                 function openDateDialog() {
-                                     var obj = pageStack.animatorPush("Sailfish.Silica.DatePickerDialog",
-                                                                      { date: selectedDate })
+                    Label {
+                        width: parent.width
+                        visible: text !== ""
+                        wrapMode: Text.Wrap
+                        text: page.profile && page.latest ? Utils.targetText(page.latest.value, page.profile.target) : ""
+                        font.pixelSize: Theme.fontSizeExtraSmall
+                        color: weightCard.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor
+                    }
 
-                                     obj.pageCompleted.connect(function(page) {
-                                         page.accepted.connect(function() {
-                                             selectedDate = page.date
-                                             value = selectedDate.toLocaleDateString("yyyy-MM-dd")
-                                         })
-                                     })
-                                 }
+                    Sparkline {
+                        visible: page.trend.length >= 2
+                        width: parent.width
+                        height: Theme.itemSizeExtraSmall
+                        points: page.trend.map(function (p) { return p.v; })
+                        lineColor: Theme.highlightColor
+                    }
 
-                                 label: "Birthday date"
-                                 id : birthdayField
-                                 width: parent.width
-                                 onClicked: openDateDialog()
-                             }
-                             TextField{
-                                 id : heightField
-                                 width:parent.width
-                                 label: "Height(cm)"; placeholderText: label
-                                 inputMethodHints: Qt.ImhFormattedNumbersOnly
-                                 EnterKey.iconSource: "image://theme/icon-m-enter-next"
-                                 EnterKey.onClicked: phoneField.focus = true
-                                 validator: RegExpValidator { regExp: /^\d+([\.|,]\d{1,2})?$/ }
-                             }
+                    Label {
+                        width: parent.width
+                        visible: page.latest === null
+                        wrapMode: Text.Wrap
+                        text: qsTr("No weight yet. Pull down to add the first one.")
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: weightCard.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor
+                    }
+                }
+            }
 
-                             }
-                         }
-                     }
-                 }
-                 Component {
-                     id: changeProfile
+            // --- height and BMI, side by side ---------------------------------------
+            Item {
+                id: halfRow
+                visible: page.profile !== null
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2 * Theme.horizontalPageMargin
+                height: Math.max(heightColumn.height, bmiColumn.height) + 2 * Theme.paddingLarge
 
-                     Page {
-                         anchors.fill: parent
-                         Column {
-                             width: parent.width
-                             PageHeader {
-                                 title: "Change Profile"
-                             }
-                             ListModel{
-                                 id:listModel
+                readonly property real cardWidth: (width - Theme.paddingMedium) / 2
 
-                                 Component.onCompleted:{
-                                     listModel.load()
-                                     profileList.currentIndex=currentProfileIndex
-                                 }
+                BackgroundItem {
+                    id: heightCard
+                    width: halfRow.cardWidth
+                    height: parent.height
+                    highlightedColor: "transparent"
+                    onClicked: page.openProfile(page.profile.code)
 
-                                 function load() {
-                                     listModel.clear()
-                                     var db = LocalStorage.openDatabaseSync("WeightTracker", "1.0", "Database application", 100000);
-                                     db.transaction(
-                                         function(tx){
-                                             var rs = tx.executeSql('SELECT * FROM USERS');
-                                             for(var i =0; i< rs.rows.length;i++){
-                                                 listModel.append({text: rs.rows.item(i).FIRSTNAME});
-                                                 usercodes[i]=rs.rows.item(i).USER_CODE;
-                                                 if(usercodes[i]==user_code) currentProfileIndex=i;
+                    CardBackground {
+                        anchors.fill: parent
+                        highlighted: heightCard.highlighted
+                    }
+                    Column {
+                        id: heightColumn
+                        x: Theme.paddingLarge
+                        y: Theme.paddingLarge
+                        width: parent.width - 2 * Theme.paddingLarge
+                        spacing: Theme.paddingSmall
 
-                                             }
-                                         }
-                                     )
-                                 }
-                             }
-                             ComboBox {
+                        Row {
+                            spacing: Theme.paddingSmall
+                            HighlightImage {
+                                width: Theme.iconSizeSmall
+                                height: Theme.iconSizeSmall
+                                sourceSize.width: Theme.iconSizeSmall
+                                sourceSize.height: Theme.iconSizeSmall
+                                source: Qt.resolvedUrl("../icons/height.svg")
+                                color: Theme.secondaryHighlightColor
+                                highlighted: heightCard.highlighted
+                            }
+                            Label {
+                                text: qsTr("Height")
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.secondaryHighlightColor
+                            }
+                        }
+                        Row {
+                            spacing: Theme.paddingSmall
+                            Label {
+                                id: heightValue
+                                text: page.profile && page.profile.height !== null ? Utils.formatValue(page.profile.height, 1) : "—"
+                                font.pixelSize: Theme.fontSizeExtraLarge
+                                color: heightCard.highlighted ? Theme.highlightColor : Theme.primaryColor
+                            }
+                            Label {
+                                anchors.baseline: heightValue.baseline
+                                //: Unit: centimetres
+                                text: qsTr("cm")
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: heightCard.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor
+                            }
+                        }
+                        Label {
+                            width: parent.width
+                            wrapMode: Text.Wrap
+                            text: qsTr("From the profile")
+                            font.pixelSize: Theme.fontSizeExtraSmall
+                            color: heightCard.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor
+                        }
+                    }
+                }
 
-                                 id: profileList
-                                 label: "Profiles"
-                                 menu: ContextMenu {
-                                     Repeater{
-                                         model: listModel
+                BackgroundItem {
+                    id: bmiCard
+                    anchors.right: parent.right
+                    width: halfRow.cardWidth
+                    height: parent.height
+                    highlightedColor: "transparent"
+                    onClicked: pageStack.animatorPush(Qt.resolvedUrl("BmiPage.qml"))
 
-                                         MenuItem {text: modelData;onClicked:{
-                                                 user_code=usercodes[index]
-                                                 currentProfileIndex=index
-                                                 var db = LocalStorage.openDatabaseSync("WeightTracker", "1.0", "Database application", 100000);
-                                                 db.transaction(
-                                                     function(tx){
-                                                         var rs = tx.executeSql('SELECT * FROM SETTINGS');
-                                                         if(rs.rows.length===0) tx.executeSql('INSERT INTO SETTINGS VALUES (?)',[user_code]);
-                                                         else tx.executeSql('UPDATE SETTINGS SET USER_CODE=?',[user_code]);
-                                                     }
-                                                 )
-                                             root.load()
-                                             pageStack.pop()}}
-                                     }
+                    CardBackground {
+                        anchors.fill: parent
+                        highlighted: bmiCard.highlighted
+                        subtle: page.bmi === null
+                    }
+                    Column {
+                        id: bmiColumn
+                        x: Theme.paddingLarge
+                        y: Theme.paddingLarge
+                        width: parent.width - 2 * Theme.paddingLarge
+                        spacing: Theme.paddingSmall
 
-                                 }
-                             }
-                             Button {
-                                 text: "Create New Profile"
-                                 anchors.horizontalCenter: parent.horizontalCenter
-                                 onClicked: pageStack.animatorPush(createProfile)
-                             }
-                         }
+                        Row {
+                            spacing: Theme.paddingSmall
+                            HighlightImage {
+                                width: Theme.iconSizeSmall
+                                height: Theme.iconSizeSmall
+                                sourceSize.width: Theme.iconSizeSmall
+                                sourceSize.height: Theme.iconSizeSmall
+                                source: Qt.resolvedUrl("../icons/bmi.svg")
+                                color: Theme.secondaryHighlightColor
+                                highlighted: bmiCard.highlighted
+                            }
+                            Label {
+                                text: qsTr("BMI")
+                                font.pixelSize: Theme.fontSizeSmall
+                                color: Theme.secondaryHighlightColor
+                            }
+                        }
+                        Label {
+                            text: page.bmi === null ? "—" : appWindow.formatNumber(page.bmi, 1)
+                            font.pixelSize: Theme.fontSizeExtraLarge
+                            color: bmiCard.highlighted ? Theme.highlightColor : Theme.primaryColor
+                        }
+                        StatusPill {
+                            text: appWindow.categoryName(page.category)
+                            dotColor: Bmi.categoryColor(page.category)
+                            maximumWidth: parent.width
+                            highlighted: bmiCard.highlighted
+                        }
+                        Label {
+                            width: parent.width
+                            visible: page.bmi === null
+                            wrapMode: Text.Wrap
+                            text: qsTr("Needs a weight")
+                            font.pixelSize: Theme.fontSizeExtraSmall
+                            color: bmiCard.highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor
+                        }
+                    }
+                }
+            }
+        }
 
-                     }
-                 }
-             }
-
-             Component.onCompleted:{
-                 user_code = WtUtils.getLastUser()
-                 load()
-             }
-         }
+        VerticalScrollDecorator {}
+    }
 }
+
+// vim:et:ts=4:sw=4
